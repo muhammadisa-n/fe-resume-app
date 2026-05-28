@@ -9,7 +9,7 @@ export default function Footer() {
               }
           `}</style>
 
-      <footer className="flex flex-col bg-linear-to-r from-white via-purple-200/60  items-center justify-around w-full py-16 text-sm text-gray-800/70">
+      <footer className="flex flex-col bg-linear-to-r from-white via-purple-200/60 items-center justify-around w-full py-16 text-sm text-gray-800/70 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-400">
         <div className="flex items-center gap-8">
           <a
             href="#"

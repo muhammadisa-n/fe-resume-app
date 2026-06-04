@@ -9,25 +9,29 @@ import { useThemeStore } from "../../stores/themeStore";
 import api from "../../config/axios";
 
 const Header = () => {
-  const { user, removeUserData } = useAuthStore();
+  const { user, removeUserData, setIsLoggingOut } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await api.post("/auth/logout", {});
-
-      removeUserData();
       toast.success("Logout berhasil. Sampai jumpa 👋");
-
-      navigate("/");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Logout gagal. Coba lagi.");
+      console.log(error?.response?.data?.message);
+      toast.error("Session sudah berakhir.");
+    } finally {
+      navigate("/", { replace: true });
+
+      setTimeout(() => {
+        removeUserData();
+        setIsLoggingOut(false);
+      }, 0);
     }
   };
-
   return (
     <header className="sticky top-0 z-50 border-b border-violet-200/40 bg-white/80 backdrop-blur-xl shadow-sm transition-colors dark:border-white/5 dark:bg-slate-950/80 dark:shadow-none">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -36,12 +36,12 @@ const LoginView = () => {
         const { data } = await api.post("/auth/login", formData);
         setUserData(data.user);
         toast.success("Login berhasil. Selamat datang kembali!");
-        navigate("/app");
+        navigate("/app", { replace: true });
       } else {
         const { data } = await api.post("/auth/register", formData);
         setUserData(data.user);
         toast.success("Akun berhasil dibuat. Selamat datang!");
-        navigate("/app");
+        navigate("/app", { replace: true });
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Terjadi kesalahan.");

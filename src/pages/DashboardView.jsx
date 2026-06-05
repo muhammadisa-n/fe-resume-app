@@ -9,10 +9,10 @@ import {
   Calendar,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
 import api from "../config/axios";
+import { useNavigate } from "react-router";
 
 const DashboardView = () => {
   const [showCreateResume, setShowCreateResume] = useState(false);
@@ -21,6 +21,7 @@ const DashboardView = () => {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -205,12 +206,13 @@ const DashboardView = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-transparent to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-violet-950/20 dark:to-slate-900" />
 
                   <div className="absolute right-4 top-4 z-20 flex translate-y-2 items-center gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                    <Link
-                      to={`/app/builder/${resume._id}`}
+                    <button
+                      key={resume._id}
+                      onClick={() => navigate(`/app/builder/${resume._id}`)}
                       className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm transition hover:bg-violet-50 hover:text-[#764de1] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-violet-300"
                     >
                       <Pencil size={17} />
-                    </Link>
+                    </button>
 
                     <button
                       onClick={() => handleDeleteResume(resume._id)}

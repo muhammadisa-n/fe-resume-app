@@ -29,3 +29,20 @@ textarea:-webkit-autofill:active {
   caret-color: #f8fafc;
   box-shadow: 0 0 0px 1000px #1e293b inset;
 }
+.react-colorful {
+  width: 100% !important;
+}
+
+.react-colorful__saturation {
+  border-radius: 18px 18px 0 0 !important;
+}
+
+.react-colorful__hue {
+  height: 14px !important;
+  border-radius: 0 0 18px 18px !important;
+}
+
+.react-colorful__pointer {
+  width: 20px !important;
+  height: 20px !important;
+}

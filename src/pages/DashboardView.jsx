@@ -7,6 +7,12 @@ import {
   Trash2,
   Loader2,
   Calendar,
+  Check,
+  Palette,
+  LayoutTemplate,
+  Languages,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,12 +22,58 @@ import { useNavigate } from "react-router";
 
 const DashboardView = () => {
   const [showCreateResume, setShowCreateResume] = useState(false);
-  const [title, setTitle] = useState("");
+  const [step, setStep] = useState(1);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    template: "classic",
+    accentColor: "#000000",
+    language: "",
+  });
+
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+
   const navigate = useNavigate();
+
+  const templates = [
+    {
+      value: "classic",
+      label: "Classic",
+      description: "Clean and ATS-friendly layout.",
+    },
+    {
+      value: "modern",
+      label: "Modern",
+      description: "Stylish and modern visual layout.",
+    },
+  ];
+
+  const colors = [
+    "#000000",
+    "#374151",
+    "#1e3a8a",
+    "#2563eb",
+    "#764de1",
+    "#16a34a",
+    "#dc2626",
+    "#ea580c",
+  ];
+
+  const languages = [
+    {
+      value: "en",
+      label: "English",
+      description: "Use English labels in resume template.",
+    },
+    {
+      value: "id",
+      label: "Indonesia",
+      description: "Gunakan label Bahasa Indonesia di template.",
+    },
+  ];
 
   useEffect(() => {
     const controller = new AbortController();
@@ -49,21 +101,51 @@ const DashboardView = () => {
 
     fetchResumes();
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, []);
 
-  const handleCreateResume = async (e) => {
-    e.preventDefault();
+  const updateFormData = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
-    if (!title.trim()) return;
+  const resetCreateForm = () => {
+    setStep(1);
+    setFormData({
+      title: "",
+      template: "classic",
+      accentColor: "#000000",
+      language: "",
+    });
+  };
+
+  const closeShowCreateResume = () => {
+    if (creating) return;
+    setShowCreateResume(false);
+    resetCreateForm();
+  };
+
+  const handleCreateResume = async () => {
+    if (!formData.title.trim()) {
+      toast.error("Resume title wajib diisi.");
+      return;
+    }
+
+    if (!formData.language) {
+      toast.error("Pilih bahasa resume terlebih dahulu.");
+      return;
+    }
 
     try {
       setCreating(true);
 
       const { data } = await api.post("/resume", {
-        title: title.trim(),
+        title: formData.title.trim(),
+        template: formData.template,
+        accentColor: formData.accentColor,
+        language: formData.language,
       });
 
       toast.success(data?.message || "Create Resume Berhasil");
@@ -72,13 +154,26 @@ const DashboardView = () => {
         setResumes((prev) => [data.resume, ...prev]);
       }
 
-      setTitle("");
       setShowCreateResume(false);
+      resetCreateForm();
     } catch (error) {
       toast.error(error?.response?.data?.message || "Terjadi kesalahan.");
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleNextStep = () => {
+    if (step === 1 && !formData.title.trim()) {
+      toast.error("Resume title wajib diisi.");
+      return;
+    }
+
+    setStep((prev) => Math.min(prev + 1, 3));
+  };
+
+  const handlePrevStep = () => {
+    setStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleDeleteResume = async (resumeId) => {
@@ -104,11 +199,8 @@ const DashboardView = () => {
 
     try {
       setDeletingId(resumeId);
-
       await api.delete(`/resume/${resumeId}`);
-
       setResumes((prev) => prev.filter((resume) => resume._id !== resumeId));
-
       toast.success("Resume berhasil dihapus.");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Gagal menghapus resume.");
@@ -117,18 +209,16 @@ const DashboardView = () => {
     }
   };
 
-  const closeShowCreateResume = () => {
-    if (creating) return;
-    setShowCreateResume(false);
-    setTitle("");
-  };
-
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("id-ID", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     });
+  };
+
+  const getLanguageLabel = (language) => {
+    return language === "id" ? "Indonesia" : "English";
   };
 
   return (
@@ -201,21 +291,27 @@ const DashboardView = () => {
               resumes.map((resume) => (
                 <div
                   key={resume._id}
+                  onClick={() => navigate(`/app/builder/${resume._id}`)}
                   className="group relative min-h-56 overflow-hidden rounded-3xl border border-violet-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#764de1] hover:shadow-xl hover:shadow-violet-200/50 dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-violet-700 dark:hover:shadow-violet-950/30"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-transparent to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-violet-950/20 dark:to-slate-900" />
 
                   <div className="absolute right-4 top-4 z-20 flex translate-y-2 items-center gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                     <button
-                      key={resume._id}
-                      onClick={() => navigate(`/app/builder/${resume._id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/app/builder/${resume._id}`);
+                      }}
                       className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm transition hover:bg-violet-50 hover:text-[#764de1] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-violet-300"
                     >
                       <Pencil size={17} />
                     </button>
 
                     <button
-                      onClick={() => handleDeleteResume(resume._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteResume(resume._id);
+                      }}
                       disabled={deletingId === resume._id}
                       className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm transition hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-red-950/40 dark:hover:text-red-400"
                     >
@@ -229,7 +325,12 @@ const DashboardView = () => {
 
                   <div className="relative z-10 flex h-full flex-col justify-between">
                     <div>
-                      <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-[#764de1] transition-all duration-300 group-hover:scale-105 dark:bg-violet-950/30 dark:text-violet-300">
+                      <div
+                        className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl text-white transition-all duration-300 group-hover:scale-105"
+                        style={{
+                          backgroundColor: resume.accentColor || "#000000",
+                        }}
+                      >
                         <FileText size={27} />
                       </div>
 
@@ -237,9 +338,15 @@ const DashboardView = () => {
                         {resume.title}
                       </h3>
 
-                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                        Template: {resume.template || "classic"}
-                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-[#764de1] dark:bg-violet-950/30 dark:text-violet-300">
+                          {resume.template || "classic"}
+                        </span>
+
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          {getLanguageLabel(resume.language)}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="mt-6 flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
@@ -276,10 +383,9 @@ const DashboardView = () => {
           onClick={closeShowCreateResume}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 px-4 backdrop-blur-sm"
         >
-          <form
-            onSubmit={handleCreateResume}
+          <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md scale-100 rounded-3xl border border-violet-100 bg-white p-6 shadow-2xl shadow-violet-950/20 animate-in fade-in zoom-in-95 duration-200 dark:border-slate-800 dark:bg-slate-900"
+            className="relative w-full max-w-lg rounded-3xl border border-violet-100 bg-white p-6 shadow-2xl shadow-violet-950/20 animate-in fade-in zoom-in-95 duration-200 dark:border-slate-800 dark:bg-slate-900"
           >
             <button
               type="button"
@@ -304,33 +410,206 @@ const DashboardView = () => {
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Give your resume a clear title so it is easier to manage later.
+                Complete a few quick steps to set up your new resume.
               </p>
             </div>
 
-            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Resume Title
-            </label>
+            <div className="mb-6 grid grid-cols-3 gap-2">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className={`h-2 rounded-full transition ${
+                    step >= item
+                      ? "bg-[#764de1]"
+                      : "bg-slate-200 dark:bg-slate-700"
+                  }`}
+                />
+              ))}
+            </div>
 
-            <input
-              type="text"
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Example: Frontend Developer Resume"
-              value={title}
-              autoFocus
-              disabled={creating}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#764de1] focus:bg-white focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-[#764de1] dark:focus:bg-slate-900 dark:focus:ring-violet-950/50"
-            />
+            {step === 1 && (
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Resume Title
+                </label>
 
-            <button
-              type="submit"
-              disabled={!title.trim() || creating}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#764de1] px-5 py-3 font-medium text-white shadow-lg shadow-violet-300/40 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#6842cd] active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0 dark:shadow-violet-950/50 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
-            >
-              {creating && <Loader2 size={18} className="animate-spin" />}
-              {creating ? "Creating..." : "Create Resume"}
-            </button>
-          </form>
+                <input
+                  type="text"
+                  onChange={(e) => updateFormData("title", e.target.value)}
+                  placeholder="Example: Frontend Developer Resume"
+                  value={formData.title}
+                  autoFocus
+                  disabled={creating}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#764de1] focus:bg-white focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-[#764de1] dark:focus:bg-slate-900 dark:focus:ring-violet-950/50"
+                />
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-5">
+                <div>
+                  <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <LayoutTemplate size={16} className="text-[#764de1]" />
+                    Choose Template
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {templates.map((template) => {
+                      const isActive = formData.template === template.value;
+
+                      return (
+                        <button
+                          key={template.value}
+                          type="button"
+                          onClick={() =>
+                            updateFormData("template", template.value)
+                          }
+                          className={`rounded-3xl border p-4 text-left transition ${
+                            isActive
+                              ? "border-[#764de1] bg-violet-50 dark:border-violet-500 dark:bg-violet-950/30"
+                              : "border-slate-200 bg-slate-50 hover:border-[#764de1] dark:border-slate-700 dark:bg-slate-800"
+                          }`}
+                        >
+                          <div className="mb-3 flex items-center justify-between">
+                            <LayoutTemplate
+                              size={20}
+                              className="text-[#764de1]"
+                            />
+                            {isActive && (
+                              <div className="rounded-full bg-[#764de1] p-1 text-white">
+                                <Check size={14} />
+                              </div>
+                            )}
+                          </div>
+
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">
+                            {template.label}
+                          </p>
+
+                          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                            {template.description}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <Palette size={16} className="text-[#764de1]" />
+                    Choose Accent Color
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {colors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => updateFormData("accentColor", color)}
+                        className={`relative h-10 w-10 rounded-2xl border-2 shadow-sm transition hover:scale-110 ${
+                          formData.accentColor === color
+                            ? "border-slate-900 ring-4 ring-violet-100 dark:border-white dark:ring-violet-950/50"
+                            : "border-white ring-1 ring-slate-200 dark:border-slate-900 dark:ring-slate-700"
+                        }`}
+                        style={{ backgroundColor: color }}
+                      >
+                        {formData.accentColor === color && (
+                          <span className="absolute inset-0 flex items-center justify-center text-white">
+                            <Check size={17} />
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div>
+                <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <Languages size={16} className="text-[#764de1]" />
+                  Choose Language
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {languages.map((language) => {
+                    const isActive = formData.language === language.value;
+
+                    return (
+                      <button
+                        key={language.value}
+                        type="button"
+                        onClick={() =>
+                          updateFormData("language", language.value)
+                        }
+                        className={`rounded-3xl border p-4 text-left transition ${
+                          isActive
+                            ? "border-[#764de1] bg-violet-50 dark:border-violet-500 dark:bg-violet-950/30"
+                            : "border-slate-200 bg-slate-50 hover:border-[#764de1] dark:border-slate-700 dark:bg-slate-800"
+                        }`}
+                      >
+                        <div className="mb-3 flex items-center justify-between">
+                          <Languages size={20} className="text-[#764de1]" />
+
+                          {isActive && (
+                            <div className="rounded-full bg-[#764de1] p-1 text-white">
+                              <Check size={14} />
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">
+                          {language.label}
+                        </p>
+
+                        <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                          {language.description}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-7 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={handlePrevStep}
+                disabled={step === 1 || creating}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              >
+                <ChevronLeft size={16} />
+                Back
+              </button>
+
+              {step < 3 ? (
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  disabled={creating}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-[#764de1] px-5 py-3 text-sm font-medium text-white shadow-lg shadow-violet-300/40 transition hover:-translate-y-0.5 hover:bg-[#6842cd] active:scale-95 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight size={16} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleCreateResume}
+                  disabled={
+                    !formData.title.trim() || !formData.language || creating
+                  }
+                  className="inline-flex items-center gap-2 rounded-2xl bg-[#764de1] px-5 py-3 text-sm font-medium text-white shadow-lg shadow-violet-300/40 transition hover:-translate-y-0.5 hover:bg-[#6842cd] active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none dark:shadow-violet-950/50 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
+                >
+                  {creating && <Loader2 size={18} className="animate-spin" />}
+                  {creating ? "Creating..." : "Create Resume"}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
-import {
-  ArrowLeft,
-  Download,
-  FileX2,
-  Share2,
-  Sparkles,
-  Copy,
-} from "lucide-react";
-import { toast } from "sonner";
+import { ArrowLeft, Download, FileX2, Sparkles } from "lucide-react";
 
 import ResumePreview from "../components/ResumePreview";
 import api from "../config/axios";
@@ -48,25 +40,6 @@ const PreviewView = () => {
 
   const handleDownloadOrPrint = () => {
     window.print();
-  };
-
-  const handleShare = async () => {
-    const resumeUrl = window.location.href;
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: resumeData?.title || "Resume",
-          text: resumeData?.title || "View my resume",
-          url: resumeUrl,
-        });
-      } else {
-        await navigator.clipboard.writeText(resumeUrl);
-        toast.success("Link resume berhasil disalin.");
-      }
-    } catch {
-      toast.error("Gagal membagikan resume.");
-    }
   };
 
   if (loading) {
@@ -155,17 +128,6 @@ const PreviewView = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleShare}
-              className="inline-flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:-translate-y-0.5 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-950/50"
-            >
-              {navigator.share ? <Share2 size={16} /> : <Copy size={16} />}
-              <span className="hidden sm:inline">
-                {navigator.share ? "Share" : "Copy Link"}
-              </span>
-            </button>
-
             <button
               type="button"
               onClick={handleDownloadOrPrint}

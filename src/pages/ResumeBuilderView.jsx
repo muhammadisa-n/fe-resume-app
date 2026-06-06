@@ -63,7 +63,7 @@ const ResumeBuilderView = () => {
     { id: "education", name: "Education", icon: GraduationCap },
     { id: "projects", name: "Projects", icon: Workflow },
     { id: "skills", name: "Skills", icon: Sparkles },
-    { id: "setting", name: "Setting", icon: Settings },
+    { id: "setting", name: "Settings", icon: Settings },
   ];
 
   const activeSection = sections[activeSectionIndex];
@@ -226,7 +226,7 @@ const ResumeBuilderView = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-[#120b24]">
+      <main className="min-h-screen overflow-x-hidden bg-gradient-to-br from-violet-50 via-white to-slate-50 transition-colors dark:from-slate-950 dark:via-slate-950 dark:to-[#120b24]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <div className="h-20 w-20 animate-spin rounded-full border-4 border-violet-200 border-t-[#764de1] dark:border-slate-800 dark:border-t-violet-400" />
@@ -316,7 +316,7 @@ const ResumeBuilderView = () => {
           </div>
         </div>
 
-        <div className="grid xl:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
           <section className="print:hidden">
             <div className="overflow-hidden rounded-3xl border border-violet-100 bg-white/90 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
               <div className="border-b border-violet-100 p-5 dark:border-slate-800">

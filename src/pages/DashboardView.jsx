@@ -292,7 +292,7 @@ const DashboardView = () => {
                 <div
                   key={resume._id}
                   onClick={() => navigate(`/app/builder/${resume._id}`)}
-                  className="group relative min-h-56 overflow-hidden rounded-3xl border border-violet-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#764de1] hover:shadow-xl hover:shadow-violet-200/50 dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-violet-700 dark:hover:shadow-violet-950/30"
+                  className="group relative min-h-56 overflow-hidden rounded-3xl border border-violet-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#764de1] hover:shadow-xl hover:shadow-violet-200/50 dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-violet-700 dark:hover:shadow-violet-950/30 cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-transparent to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-violet-950/20 dark:to-slate-900" />
 

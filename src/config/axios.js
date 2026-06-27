@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "../stores/authStore";
+import { isSsoActive, getSsoLoginUrl } from "./sso";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL + `/api`,
@@ -13,7 +14,12 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !isLogoutRequest) {
       useAuthStore.getState().removeUserData();
-      window.location.href = `${import.meta.env.BASE_URL}login`;
+
+      if (isSsoActive()) {
+        window.location.href = getSsoLoginUrl();
+      } else {
+        window.location.href = `${import.meta.env.BASE_URL}login`;
+      }
     }
 
     return Promise.reject(error);

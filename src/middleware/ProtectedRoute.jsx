@@ -1,6 +1,7 @@
 import { Navigate } from "react-router";
 import { Sparkles } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
+import { isSsoActive, getSsoLoginUrl } from "../config/sso";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthentication, isCheckingAuth, isLoggingOut } = useAuthStore();
@@ -40,6 +41,11 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthentication) {
+    if (isSsoActive()) {
+      window.location.href = getSsoLoginUrl();
+      return null;
+    }
+
     return <Navigate to="/login" replace />;
   }
 

@@ -12,6 +12,7 @@ import { useNavigate, Navigate, Link } from "react-router";
 import { toast } from "sonner";
 import { useAuthStore } from "../stores/authStore";
 import api from "../config/axios";
+import { isSsoActive, getSsoLoginUrl } from "../config/sso";
 
 const LoginView = () => {
   const [state, setState] = useState("login");
@@ -56,6 +57,11 @@ const LoginView = () => {
   };
 
   if (isAuthentication) return <Navigate to="/app" replace />;
+
+  if (isSsoActive()) {
+    window.location.href = getSsoLoginUrl();
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-slate-50 flex items-center justify-center px-4 transition-colors dark:from-slate-950 dark:via-slate-950 dark:to-[#120b24]">

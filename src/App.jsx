@@ -6,6 +6,7 @@ import LoginView from "./pages/LoginView";
 import DashboardView from "./pages/DashboardView";
 import PreviewView from "./pages/PreviewView";
 import ResumeBuilderView from "./pages/ResumeBuilderView";
+import ProfileView from "./pages/ProfileView";
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import { useAuthStore } from "./stores/authStore";
@@ -44,6 +45,7 @@ function App() {
       >
         <Route index element={<DashboardView />} />
         <Route path="builder/:resumeId" element={<ResumeBuilderView />} />
+        <Route path="profile" element={<ProfileView />} />
       </Route>
     </Routes>
   );

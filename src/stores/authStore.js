@@ -21,6 +21,11 @@ export const useAuthStore = create(
       set({ user: null, isAuthentication: false });
     },
 
+    updateUser: (user) => {
+      localStorage.setItem("user", JSON.stringify(user));
+      set({ user });
+    },
+
     checkAuth: async () => {
       try {
         const { data } = await api.get("/auth/me");

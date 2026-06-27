@@ -64,10 +64,21 @@ const Header = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-4">
             {/* User Profile */}
-            <div className="flex items-center gap-3 rounded-full border border-violet-100 bg-violet-50 px-4 py-2 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-900">
-              <div className="w-9 h-9 rounded-full bg-[#764de1] text-white flex items-center justify-center font-semibold shadow dark:shadow-violet-950/50">
-                {user?.name?.charAt(0)?.toUpperCase()}
-              </div>
+            <button
+              onClick={() => navigate("/app/profile")}
+              className="flex items-center gap-3 rounded-full border border-violet-100 bg-violet-50 px-4 py-2 shadow-sm transition-colors hover:bg-violet-100 cursor-pointer dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+            >
+              {user?.image_url ? (
+                <img
+                  src={user.image_url}
+                  alt={user.name}
+                  className="w-9 h-9 rounded-full object-cover shadow dark:shadow-violet-950/50"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-[#764de1] text-white flex items-center justify-center font-semibold shadow dark:shadow-violet-950/50">
+                  {user?.name?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
 
               <div className="leading-tight">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -78,7 +89,7 @@ const Header = () => {
                   {user?.name}
                 </p>
               </div>
-            </div>
+            </button>
 
             {/* Theme Toggle */}
             <button
@@ -118,10 +129,24 @@ const Header = () => {
         >
           <div className="mt-3 rounded-3xl border border-violet-100 bg-white p-4 shadow-lg shadow-violet-100/50 transition-colors dark:border-slate-700 dark:bg-slate-900 dark:shadow-none">
             {/* User */}
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
-              <div className="w-11 h-11 rounded-full bg-[#764de1] text-white flex items-center justify-center font-semibold shadow dark:shadow-violet-950/50">
-                {user?.name?.charAt(0)?.toUpperCase()}
-              </div>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                navigate("/app/profile");
+              }}
+              className="flex items-center gap-3 border-b border-slate-100 pb-4 w-full text-left cursor-pointer dark:border-slate-800"
+            >
+              {user?.image_url ? (
+                <img
+                  src={user.image_url}
+                  alt={user.name}
+                  className="w-11 h-11 rounded-full object-cover shadow dark:shadow-violet-950/50"
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-full bg-[#764de1] text-white flex items-center justify-center font-semibold shadow dark:shadow-violet-950/50">
+                  {user?.name?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
 
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -132,7 +157,7 @@ const Header = () => {
                   {user?.name}
                 </p>
               </div>
-            </div>
+            </button>
 
             {/* Theme Toggle */}
             <button

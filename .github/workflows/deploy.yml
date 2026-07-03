@@ -26,7 +26,7 @@ jobs:
             nvm use 20.19.5
             cd /var/www/${{ secrets.VPS_DOMAIN }}/fe-resume-app
             echo "Pull latest code..."
-            git pull origin main
+            git fetch origin main
             echo "Create env file..."
             rm -f .env
             cat > .env << 'EOF'

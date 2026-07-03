@@ -7,6 +7,11 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.request.use((config) => {
+  config.headers["x-origin-url"] = window.location.href;
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {

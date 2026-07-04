@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User2Icon,
   Mail,
@@ -56,12 +56,15 @@ const LoginView = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    if (!isAuthentication && isSsoActive()) {
+      window.location.assign(getSsoLoginUrl());
+    }
+  }, [isAuthentication]);
+
   if (isAuthentication) return <Navigate to="/app" replace />;
 
-  if (isSsoActive()) {
-    window.location.href = getSsoLoginUrl();
-    return null;
-  }
+  if (isSsoActive()) return null;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-slate-50 flex items-center justify-center px-4 transition-colors dark:from-slate-950 dark:via-slate-950 dark:to-[#120b24]">

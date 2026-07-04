@@ -7,6 +7,7 @@ import { Menu, X, LogOut, Sparkles, Moon, Sun } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
 import { useThemeStore } from "../../stores/themeStore";
 import api from "../../config/axios";
+import { isSsoActive, getSsoLoginUrl } from "../../config/sso";
 
 const Header = () => {
   const { user, removeUserData, setIsLoggingOut } = useAuthStore();
@@ -24,12 +25,17 @@ const Header = () => {
       console.log(error?.response?.data?.message);
       toast.error("Session sudah berakhir.");
     } finally {
-      navigate("/", { replace: true });
+      removeUserData();
+      setIsLoggingOut(false);
 
       setTimeout(() => {
-        removeUserData();
-        setIsLoggingOut(false);
-      }, 0);
+        if (isSsoActive()) {
+          window.location.assign(getSsoLoginUrl());
+          return;
+        }
+
+        navigate("/", { replace: true });
+      }, 800);
     }
   };
   return (
